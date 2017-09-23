@@ -88,6 +88,45 @@ class BrainfuckMachineTest(unittest.TestCase):
         out = self.vm.eval(src)
         self.assertEqual(out, '\x0b\x00')
 
+    def test_eval_read_from_input(self):
+        # This program reads 10 numbers from the input and sums them.
+        src = '''
+                        ; Registers:
+                        ; ==========
+                        ; c0 : Number of inputs left
+                        ; c1 : Current input number
+                        ; c2 : Sum accumulator
+
+                        ; Set the size of the input
+        +++++ +++++     ; c0 = 10
+
+                        ; LOOP: Read numbers and sum them to c2
+                        ; Begin at c0
+        [
+        > ,             ; c1 = input()
+
+                        ; LOOP: Increment c2 and decrement c1
+                        ; Begin at c1
+        [
+        > +             ; inc c2
+        < -             ; dec c1
+        ]
+                        ; ENDLOOP: Now c2 = sum(c2; c1) c1 = 0
+
+        < -             ; dec c0
+        ]
+                        ; ENLOOP: No more inputs left to read
+                        ;         c2 = sum(inputs)
+
+        >>.             ; Print(c2)
+        '''
+        inputs = ['Helloworld', 'lolkekwtf0', 'plexiglass']
+        for s in inputs:
+            # Assert that the test case is ok for the program.
+            self.assertEqual(10, len(s), 'Wrong input size')
+            correct_ans = chr(sum([ord(c) for c in s]))
+            self.assertEqual(correct_ans, self.vm.eval(src, s))
+
     def test_eval_when_source_is_invalid(self):
         vm = BrainfuckMachine()
         invalid_sources = ['[[[', ']]', '[[][]][]]', ']']
