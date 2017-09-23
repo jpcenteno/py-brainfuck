@@ -127,6 +127,29 @@ class BrainfuckMachineTest(unittest.TestCase):
             correct_ans = chr(sum([ord(c) for c in s]))
             self.assertEqual(correct_ans, self.vm.eval(src, s))
 
+    def test_eval_input_too_short_exception(self):
+        # This program reads 10 numbers from the input.
+        src = '''
+                        ; Registers:
+                        ; ==========
+                        ; c0 : Number of inputs left
+                        ; c1 : Current input number
+
+                        ; Set the size of the input
+        +++++ +++++     ; c0 = 10
+
+                        ; LOOP: Read numbers and sum them to c2
+                        ; Begin at c0
+        [
+        > ,             ; c1 = input()
+        < -             ; dec c0
+        ]
+        '''
+        inputs = ['foo', '', 'lolwut', 'wtfwyd', '1234']
+        for s in inputs:
+            assert len(s) < 10 # Assert that the inputs are invalid.
+            self.assertRaises(InputTooShortException, self.vm.eval, src, s)
+
     def test_eval_when_source_is_invalid(self):
         vm = BrainfuckMachine()
         invalid_sources = ['[[[', ']]', '[[][]][]]', ']']
