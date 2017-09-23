@@ -37,7 +37,7 @@ def validate_src(src):
     return depth == 0
 
 
-class InputException(Exception):
+class InputTooShortException(Exception):
     pass
 
 class InvalidSrcException(Exception):
@@ -121,12 +121,12 @@ class BrainfuckMachine(object):
 
     def _read_from_input(self):
         ''','''
-        try:
+        if len(self._input):
             c = ord(self._input[0])
             self._set_tape(c)
             self._input = self._input[1:]
-        except:
-            raise InputException()
+        else:
+            raise InputTooShortException()
 
     def _write_to_output(self):
         '''.'''
